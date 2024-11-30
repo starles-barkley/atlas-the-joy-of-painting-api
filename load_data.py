@@ -31,22 +31,26 @@ def insert_data(connection, df):
                 INSERT INTO Episodes (EpisodeName, BroadcastDate)
                 VALUES (%s, %s)
                 ON CONFLICT DO NOTHING;
-            """, (row['EpisodeName'], row['BroadcastDate']))
+            """, (row['painting_title'], None))  # Assuming BroadcastDate is not available in this file
 
-            cursor.execute("SELECT EpisodeID FROM Episodes WHERE EpisodeName = %s", (row['EpisodeName'],))
+            cursor.execute("SELECT EpisodeID FROM Episodes WHERE EpisodeName = %s", (row['painting_title'],))
             episode_id = cursor.fetchone()[0]
 
-            cursor.execute("""
-                INSERT INTO Subjects (EpisodeID, Subject)
-                VALUES (%s, %s)
-                ON CONFLICT DO NOTHING;
-            """, (episode_id, row['Subject']))
+            subjects = row['subjects'].split(',')
+            for subject in subjects:
+                cursor.execute("""
+                    INSERT INTO Subjects (EpisodeID, Subject)
+                    VALUES (%s, %s)
+                    ON CONFLICT DO NOTHING;
+                """, (episode_id, subject.strip()))
 
-            cursor.execute("""
-                INSERT INTO Colors (EpisodeID, ColorName, HexCode)
-                VALUES (%s, %s, %s)
-                ON CONFLICT DO NOTHING;
-            """, (episode_id, row['ColorName'], row['HexCode']))
+            colors = row['colors'].split(',')
+            for color in colors:
+                cursor.execute("""
+                    INSERT INTO Colors (EpisodeID, ColorName, HexCode)
+                    VALUES (%s, %s, %s)
+                    ON CONFLICT DO NOTHING;
+                """, (episode_id, color.strip(), None))  # Assuming HexCode is not available
 
         except Exception as e:
             print(f"Error inserting data: {e}")
