@@ -18,7 +18,6 @@ app.get('/', (req, res) => {
     res.json({ message: 'The Joy of Painting API is running!' });
 });
 
-// Filter episodes based on query parameters
 app.get('/episodes', async (req, res) => {
   const { month, subjects, colors, match } = req.query;
 
@@ -33,13 +32,11 @@ app.get('/episodes', async (req, res) => {
   const queryParams = [];
   const conditions = [];
 
-  // Filter by broadcast month
   if (month) {
       conditions.push("EXTRACT(MONTH FROM e.BroadcastDate) = $1");
       queryParams.push(month);
   }
 
-  // Filter by subjects
   if (subjects) {
       const subjectList = subjects.split(',');
       if (match === 'AND') {
@@ -59,7 +56,6 @@ app.get('/episodes', async (req, res) => {
       queryParams.push(...subjectList);
   }
 
-  // Filter by colors
   if (colors) {
       const colorList = colors.split(',');
       if (match === 'AND') {
